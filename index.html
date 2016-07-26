@@ -8,39 +8,28 @@
     </head>
 
     <body>
-      <div id = "title">
-        <p> Lollygag </p>
+      <div id = "title" class = "LeagueTitle">
+        <p> LOLLYGAG </p>
       </div>
 
       <div id = "section">
         <center>
         <div class = "sectionItem">
-          <form action="index.php">
-          <p class = "sectionHeader"> Player Compare </p>
+          <form action="index.html">
+          <p class = "sectionHeader"> Compare players </p>
           <div class="input-list style-1 clearfix">
             <input id = "player1" name = "player1" type="text" placeholder="Player 1">
-            vs
+            <a class = "league_text"> vs <a>
             <input id = "player2" name = "player2" type="text" placeholder="Player 2">
           </div>
           <br>
-          <input type="submit" value="Submit">
+          <a href="#" class="button-0">Submit</a>
           </form>
         </div>
         </center>
-
         <center>
-        <div class = "sectionItem">
-          <form action="index.html">
-          <p class = "sectionHeader"> Team Compare </p>
-          <div class="input-list style-1 clearfix">
-            <input id = "team1" name = "team1" type="text" placeholder="Team 1">
-            vs
-            <input id = "team2" name = "team2" type="text" placeholder="Team 2">
+          <div id = "sectionBorder">
           </div>
-          <br>
-          <input type="submit" value="Submit">
-          </form>
-        </div>
         </center>
       </div>
       <?php
