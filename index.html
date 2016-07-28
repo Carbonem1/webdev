@@ -1,10 +1,36 @@
 <!DOCTYPE html>
+<meta charset="UTF-8">
 
 <html>
     <head>
 		<script type = "text/javascript" src = "js/js.js"> </script>
         <link rel = "stylesheet" href = "css/styles.css" type = "text/css">
         <title> Lollygag </title>
+
+
+		<script type = "text/javascript">
+			//used to create unique IDs for input fields
+			uniq_pid=2;
+
+			function addComparison()
+			{
+				newrow="<input id = \"player"+uniq_pid+"\" name = \"player"+uniq_pid+"\" type=\"text\" placeholder =\"Player "+uniq_pid+"\">";
+				uniq_pid++;
+				newrow+="<a class = \"league_text\"> vs </a>";
+				newrow+="<input id = \"player"+uniq_pid+"\" name = \"player"+uniq_pid+"\" type=\"text\" placeholder =\"Player "+uniq_pid+"\">";
+				uniq_pid++;
+				newrow+="<br />";
+				//temporary (until jquery running)
+				innertext=document.getElementById("comparisonRows").innerHTML;
+				if(uniq_pid == 6) 
+				{
+					document.getElementById("addButton").disabled=true;
+				    document.getElementById("comparisonRows").innerHTML = innertext+newrow;
+				}
+				else if (uniq_pid < 6) {document.getElementById("comparisonRows").innerHTML = innertext+newrow;}
+				else { newrow="";}
+			}
+		</script>
     </head>
 
     <body>
@@ -15,16 +41,15 @@
       <div id = "section">
         <center>
         <div class = "sectionItem">
-          <form action="index.html">
           <p class = "sectionHeader"> Compare players </p>
-          <div class="input-list style-1 clearfix">
+          <div class="input-list style-1 clearfix" id="comparisonRows">
             <input id = "player1" name = "player1" type="text" placeholder="Player 1">
-            <a class = "league_text"> vs <a>
+            <a class = "league_text"> vs </a>
             <input id = "player2" name = "player2" type="text" placeholder="Player 2">
+		    <br />
           </div>
-          <br>
-          <a href="#" class="button-0">Submit</a>
-          </form>
+		  <button id="addButton" onClick=addComparison()>Add</button>
+		  <button onClick=submitRequest()> Submit </button>
         </div>
         </center>
         <center>
@@ -40,6 +65,8 @@
       mysql_select_db("dbo") or die(mysql_error());
 
       // SQL query
+      $strSQL = "SELECT * FROM Players";
+
       $strSQL = "SELECT * FROM Players";
 
       // Execute the query (the recordset $rs contains the result)
