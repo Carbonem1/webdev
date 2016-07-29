@@ -4,6 +4,7 @@
 <html>
     <head>
 		<script type = "text/javascript" src = "js/js.js"> </script>
+		<script src = "jquery-3.1.0.min.js"> </script>
         <link rel = "stylesheet" href = "css/styles.css" type = "text/css">
         <title> Lollygag </title>
 
@@ -12,73 +13,129 @@
 			//used to create unique IDs for input fields
 			uniq_pid=2;
 
+			//initialization
+//			$(document).ready(function(){
+//				$("#submitButton").click(function(){
+
+			function submitRequest()
+			{
+					//sample: {name1: test, name2: test}
+
+					var names = [];
+					var dataString = "";
+					
+					//pull data from text boxes and connect to ajax to submit
+					for(i=1; i<=uniq_pid; i++)
+					{
+						text=$("#player"+i).val();
+						dataString+="player"+i+"="+text;
+
+						//add name to master array
+						names.push(text);
+
+						if(i < uniq_pid) {dataString+="&";}
+					}
+					console.log(dataString);
+
+					var xmlhttp = new XMLHttpRequest();
+					xmlhttp.onreadystatechange = function () {
+						outstring="JIGGLERS";
+						if(xmlhttp.readyState == 4 && xmlhttp.status == 200) 
+						{
+							var testdata = xmlhttp.responseText;
+							console.log("START TEST DATA");
+							console.log(testdata);
+							console.log("END TEST DATA");
+						}
+						$("#titletext").html(outstring);
+					};
+
+					xmlhttp.open("GET", "newrequest.php?"+dataString, true);
+					xmlhttp.setRequestHeader("Content-Type", "application/json");
+					//xmlhttp.send(dataString);
+					xmlhttp.send();
+					/*send data
+					$.ajax({
+						type: "POST",
+						url: "php/request.php",
+						data: dataString,
+						success: function(data) {console.log("SUCCESS!!!!!");},
+						error:	 function()	 	{console.log("NO!!!!!");}
+					});*/ //end ajax
+//				});//end button submit
+//			});//end document ready
+			}
+
+
 			function addComparison()
 			{
+				//PLAYER 1
+				uniq_pid++;
 				newrow="<input id = \"player"+uniq_pid+"\" name = \"player"+uniq_pid+"\" type=\"text\" placeholder =\"Player "+uniq_pid+"\">";
-				uniq_pid++;
+
+				//VS
 				newrow+="<a class = \"league_text\"> vs </a>";
-				newrow+="<input id = \"player"+uniq_pid+"\" name = \"player"+uniq_pid+"\" type=\"text\" placeholder =\"Player "+uniq_pid+"\">";
+	
+				//PLAYER 2
 				uniq_pid++;
+				newrow+="<input id = \"player"+uniq_pid+"\" name = \"player"+uniq_pid+"\" type=\"text\" placeholder =\"Player "+uniq_pid+"\">";
 				newrow+="<br />";
-				//temporary (until jquery running)
-				innertext=document.getElementById("comparisonRows").innerHTML;
+				newrow+="<br />";
+				
 				if(uniq_pid == 6) 
 				{
-					document.getElementById("addButton").disabled=true;
-				    document.getElementById("comparisonRows").innerHTML = innertext+newrow;
+					$("#addButton").prop("disabled", true);
+					$("#comparisonRows").append(newrow);
 				}
-				else if (uniq_pid < 6) {document.getElementById("comparisonRows").innerHTML = innertext+newrow;}
+				else if (uniq_pid < 6) 
+				{
+					$("#comparisonRows").append(newrow);
+				}
 				else { newrow="";}
+
+				$("#removeButton").prop("disabled", false);
+			}
+			function removeComparison()
+			{
+				text=$("#comparisonRows").html();
+				uniq_pid -=2;
+				if(uniq_pid == 2)
+				{
+					$("#removeButton").prop("disabled", true);
+				}
+
+				text = text.substring(0, text.length-178);
+
+				$("#addButton").prop("disabled", false);
+
+				$("#comparisonRows").html(text);
 			}
 		</script>
+
     </head>
 
     <body>
       <div id = "title" class = "LeagueTitle">
-        <p> LOLLYGAG </p>
+        <p id="titletext"> LOLLYGAG </p>
       </div>
 
       <div id = "section">
         <center>
-        <div class = "sectionItem">
-          <p class = "sectionHeader"> Compare players </p>
-          <div class="input-list style-1 clearfix" id="comparisonRows">
-            <input id = "player1" name = "player1" type="text" placeholder="Player 1">
-            <a class = "league_text"> vs </a>
-            <input id = "player2" name = "player2" type="text" placeholder="Player 2">
-		    <br />
+          <div class = "sectionItem">
+            <p class = "sectionHeader"> Compare players </p>
+            <div class="input-list style-1 clearfix" id="comparisonRows">
+              <input id = "player1" name = "player1" type="text" placeholder="Player 1">
+              <a class = "league_text"> vs </a>
+              <input id = "player2" name = "player2" type="text" placeholder="Player 2">
+		      <br /> <br />
+            </div>
+		    <button id="addButton"    onClick=addComparison()>Add</button>
+		    <button id="removeButton" onClick=removeComparison() disabled=true>Remove</button>
+		    <button onClick=submitRequest()> Submit </button>
           </div>
-		  <button id="addButton" onClick=addComparison()>Add</button>
-		  <button onClick=submitRequest()> Submit </button>
-        </div>
-        </center>
-        <center>
           <div id = "sectionBorder">
           </div>
         </center>
       </div>
-      <?php
-      // Connect to database server
-      mysql_connect("mysql.fdb-srv1.ccoyq2utebl6.us-west-2.rds.amazonaws.com", "admin", "nicholas1") or die (mysql_error ());
-
-      // Select database
-      mysql_select_db("dbo") or die(mysql_error());
-
-      // SQL query
-      $strSQL = "SELECT * FROM Players";
-
-      $strSQL = "SELECT * FROM Players";
-
-      // Execute the query (the recordset $rs contains the result)
-      $rs = mysql_query($strSQL);
-
-      // Loop the recordset $rs
-      // Each row will be made into an array ($row) using mysql_fetch_array
-      while($row = mysql_fetch_array($rs)) {
-        }
-
-      // Close the database connection
-      mysql_close();
-      ?>
-    </body>
+</body>
 </html>
