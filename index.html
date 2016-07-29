@@ -12,10 +12,7 @@
 		<script type = "text/javascript">
 			//used to create unique IDs for input fields
 			uniq_pid=2;
-
-			//initialization
-//			$(document).ready(function(){
-//				$("#submitButton").click(function(){
+			$("#addButton").prop("disabled", "false");
 
 			function submitRequest()
 			{
@@ -23,47 +20,54 @@
 
 					var names = [];
 					var dataString = "";
-					
+					dataString="\{"
 					//pull data from text boxes and connect to ajax to submit
 					for(i=1; i<=uniq_pid; i++)
 					{
 						text=$("#player"+i).val();
-						dataString+="player"+i+"="+text;
+						dataString+="\"player"+i+"\": \""+text+"\"";
 
 						//add name to master array
 						names.push(text);
 
-						if(i < uniq_pid) {dataString+="&";}
+						if(i < uniq_pid) {dataString+=", ";}
 					}
+					dataString+="\}";
 					console.log(dataString);
 
-					var xmlhttp = new XMLHttpRequest();
-					xmlhttp.onreadystatechange = function () {
-						outstring="JIGGLERS";
-						if(xmlhttp.readyState == 4 && xmlhttp.status == 200) 
-						{
-							var testdata = xmlhttp.responseText;
-							console.log("START TEST DATA");
-							console.log(testdata);
-							console.log("END TEST DATA");
-						}
-						$("#titletext").html(outstring);
-					};
-
-					xmlhttp.open("GET", "newrequest.php?"+dataString, true);
-					xmlhttp.setRequestHeader("Content-Type", "application/json");
-					//xmlhttp.send(dataString);
-					xmlhttp.send();
-					/*send data
-					$.ajax({
+				    $.ajax({
 						type: "POST",
-						url: "php/request.php",
-						data: dataString,
-						success: function(data) {console.log("SUCCESS!!!!!");},
-						error:	 function()	 	{console.log("NO!!!!!");}
-					});*/ //end ajax
-//				});//end button submit
-//			});//end document ready
+						url: "newrequest.php",
+						data: JSON.parse(dataString),
+						success: function(data) {
+							alert(data);
+							fullstring = data;
+							numlist = fullstring.split(",");
+							for(i=0;i<=numlist.length;i+=2)
+							{
+								if(numlist[i] > numlist[i+1])
+								{
+									//set player(i+1) color to green and player(i+2) color to red
+									$("#player"+(i+1)).css("background-color", "green");
+									$("#player"+(i+2)).css("background-color", "red");
+								}
+								if(numlist[i] < numlist[i+1])
+								{
+									//set player(i+1) color to RED   and player i+2 color to GREEN
+									$("#player"+(i+2)).css("background-color", "green");
+									$("#player"+(i+1)).css("background-color", "red");
+								}
+								if(numlist[i] == numlist[i+1])
+								{
+									//set both colors to yellow
+									$("#player"+(i+2)).css("background-color", "yellow");
+									$("#player"+(i+1)).css("background-color", "yellow");
+								}
+							}
+						}
+						
+					});
+
 			}
 
 
@@ -110,6 +114,10 @@
 
 				$("#comparisonRows").html(text);
 			}
+			function clearFields()
+			{
+				$("input").val('')
+			}
 		</script>
 
     </head>
@@ -124,14 +132,15 @@
           <div class = "sectionItem">
             <p class = "sectionHeader"> Compare players </p>
             <div class="input-list style-1 clearfix" id="comparisonRows">
-              <input id = "player1" name = "player1" type="text" placeholder="Player 1">
-              <a class = "league_text"> vs </a>
-              <input id = "player2" name = "player2" type="text" placeholder="Player 2">
-		      <br /> <br />
+              	<input id = "player1" name = "player1" type="text" placeholder="Player 1" onfocus = "this.placeholder = ''"" onblur = "this.placeholder = 'Player 1'">
+              	<a class = "league_text"> vs </a>
+              	<input id = "player2" name = "player2" type="text" placeholder="Player 2">
+		      	<br /> <br />
             </div>
 		    <button id="addButton"    onClick=addComparison()>Add</button>
 		    <button id="removeButton" onClick=removeComparison() disabled=true>Remove</button>
 		    <button onClick=submitRequest()> Submit </button>
+		    <button id="clearButton"    onClick=clearFields()>Clear</button>
           </div>
           <div id = "sectionBorder">
           </div>
