@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<meta charset="UTF-8">
+
+<html>
+    <head>
+		<script type = "text/javascript" src = "js/js.js"> </script>
+		<script src = "jquery-3.1.0.min.js"> </script>
+		<script src = "chosen-1.6.1/chosen.jquery.js"> </script>
+        <link rel = "stylesheet" href = "css/styles.css" type = "text/css">
+		<link rel = 'shortcut icon' href = 'images/favicon.ico' type = 'image/x-icon'/>
+        <title> Lollygag </title>
+
+
+		<script type = "text/javascript">
+			//used to create unique IDs for input fields
+			uniq_pid=2;
+			uniq_pid2=2;
+			//used to delete breaks
+			br_id=0;
+			br_id2=0;
+			//element string for the options
+			el_str="";
+
+			$(document).ready(function() {
+				//generates datalist of available champions for dropdown list
+				    $.ajax({
+						type: "POST",
+						url: "namerequest.php",
+						success: function(data) {
+						//	el_str="<datalist id=\"Names\">";
+							namelist=data.split(",");
+							for(i=0;i<namelist.length;i++)
+							{
+								el_str+="<option value=\""+namelist[i]+"\">"+namelist[i]+"</option>";
+							}
+						//	el_str+="</datalist>";
+						//	$("#listp").html(el_str);
+						}//end ajax success function
+					});//end $.ajax
+
+				//add first two elements to comparisonRows
+				p1txt="<select data-placeholder=\"Player1\" id=\"player1\" class=\"chosen-select\">"+el_str+"</select>";
+				p2txt="<select data-placeholder=\"Player2\" id=\"player2\" class=\"chosen-select\">"+el_str+"</select>";
+
+
+				$(".chosen-select").chosen();
+				
+
+              	vstxt="<a class = \"league_text\"> vs </a>";
+				output=p1txt+" "+vstxt+" "+p2txt+"<br><br>";
+				$("#comparisonRows").html(output);
+			});
+
+
+			//main request function (contains response function for "submit")
+			function submitRequest()
+			{
+					//create JSON string of parameters (1 per text box)
+					var dataString = "";
+					dataString="\{"
+					//get the name of each player( "Player1":"Nick" )
+					for(i=1; i<=uniq_pid; i++)
+					{
+						text=$("#player"+i).val();
+						dataString+="\"player"+i+"\": \""+text+"\"";
+
+						//add comma unless last element
+						if(i < uniq_pid) {dataString+=", ";}
+					}
+					dataString+="\}";
+
+					//submit data to php file for MySQL query
+				    $.ajax({
+						type: "POST",
+						url: "request.php",
+						data: JSON.parse(dataString),
+						success: function(data) {
+							//get rid of the '{' and '}' around the JSON result
+							fullstring = data.slice(1, -1);
+							//split by each entry
+							fullstring = fullstring.split(",");
+
+							//map of names to scores, ex: "Nick":"87.655"
+							var results = {};
+							for(var i=0; i < fullstring.length; i++)
+							{
+								row = fullstring[i];
+								rowarr = fullstring[i].split(":");
+								name = rowarr[0];
+								score = rowarr[1];
+								//slice quotes off name and score
+								name=name.slice(1,-1);
+								score=score.slice(1,-1);
+								results[name] = score;
+							}
+							//iterate through text boxes and assign values
+							num_scores=0;//number of scores evaluated
+							for(i=0;i<5;i++,num_scores+=2)
+							{
+								
+								name1 = $("#player"+(num_scores+1)+" option:selected").val();
+								console.log("NIGGERS "+name1);
+								name2 = $("#player"+(num_scores+2)).val();
+
+								if(!name1 || !name2) {console.log("Hit end of input");break;}
+								score1=results[name1];
+								score2=results[name2];
+
+				
+								//default comparison colors are quite dark
+								green = "#00FF00";
+								red   = "#FF0000";
+							
+								score1=parseFloat(score1);	
+								score2=parseFloat(score2);	
+								if(score1 > score2)
+								{
+									//colors get lighter as win% is greater. at 30pts+, "green" actually becomes "gold"
+									if(score1 > (score2+30)) { green = "#e6b800"; red = "#FF0000"; }
+
+									//add scores to text boxes and assign borders
+									$("#player"+(num_scores+1)).css("border", 'solid 5px '+green);
+									$("#player"+(num_scores+1)).val(name1+": "+score1);
+									$("#player"+(num_scores+2)).css("border", 'solid 5px '+red);
+									$("#player"+(num_scores+2)).val(name2+": "+score2);
+								}
+								else if(score1 < score2)
+								{
+									if(score2 > (score1+30)) { green = "#e6b800"; red = "#FF0000"; }
+
+									$("#player"+(num_scores+2)).css("border", 'solid 5px '+green);
+									$("#player"+(num_scores+1)).val(name1+": "+score1);
+									$("#player"+(num_scores+1)).css("border", 'solid 5px '+red);
+									$("#player"+(num_scores+2)).val(name2+": "+score2);
+								}
+								else if(score1 == score2)
+								{
+									$("#player"+(num_scores+2)).css("border", 'solid 5px #FFFF00');
+									$("#player"+(num_scores+1)).css("border", 'solid 5px #FFFF00');
+									$("#player"+(num_scores+1)).val(name1+": "+score1);
+									$("#player"+(num_scores+2)).val(name2+": "+score2);
+								}
+							}//end for(pair of scores)
+						}//end ajax success function
+					});//end $.ajax
+
+			}//end submitrequest
+
+
+			function addComparison()
+			{
+				//generate HTML for another pair of "input vs. input"
+				//PLAYER 1
+				uniq_pid++;
+				newrow="<input id = \"player"+uniq_pid+"\" name = \"player"+uniq_pid+"\" type=\"text\" list=\"Names\" placeholder =\"Player "+uniq_pid+"\" onfocus = \"this.placeholder = ''\" onblur = \"this.placeholder = 'Player "+uniq_pid+"'\">";
+
+				//VS2(or3) (pid=3 or 5)
+				newrow+="<a id=\"vs"+parseInt(uniq_pid/2+1)+"\" class = \"league_text\"> vs </a>";
+	
+				//PLAYER 2
+				uniq_pid++;
+				newrow+="<input id = \"player"+uniq_pid+"\" name = \"player"+uniq_pid+"\" type=\"text\" list=\"Names\" placeholder =\"Player "+uniq_pid+"\" onfocus = \"this.placeholder = ''\" onblur = \"this.placeholder = 'Player "+uniq_pid+"'\">";
+				
+				br_id++;
+				newrow+="<br id=\""+br_id+"\">";
+				br_id++;
+				newrow+="<br id=\""+br_id+"\">";
+
+				//TEST FOR NEW JQUERY PLUGIN
+				uniq_pid2++;
+				newrow2="<select data-placeholder=\"Player"+uniq_pid2+"\" id=\"player"+uniq_pid2+"\" class=\"chosen-select\" tabindex=\"2\">"+el_str+"</select>";
+				//VS2(or3) (pid=3 or 5)
+				newrow2+="<a id=\"vs"+parseInt(uniq_pid2/2+1)+"\" class = \"league_text\"> vs </a>";
+				//p2
+				uniq_pid2++;
+				newrow2+="<select data-placeholder=\"Player"+uniq_pid2+"\" id=\"player"+uniq_pid2+"\" class=\"chosen-select\" tabindex=\"2\">"+el_str+"</select>";
+
+
+				br_id2++;
+				newrow2+="<br id=\""+br_id2+"\">";
+				br_id2++;
+				newrow2+="<br id=\""+br_id2+"\">";
+
+
+				console.log("TEST: "+newrow2);
+				//DO NOT FORGET TO CHANGE newrow2 BACK TO newrow IF THIS FAILS
+				//if adding last text boxes, disable addbutton
+				//either way, add the new row to <div> comparisonRows
+				if(uniq_pid2 == 10) 
+				{
+					$("#addButton").prop("disabled", true);
+					$("#comparisonRows").append(newrow2);
+				}
+				else if (uniq_pid2 < 10) 
+				{
+					$("#comparisonRows").append(newrow2);
+				}
+				else {newrow2="";}
+
+				$(".chosen-select").chosen();
+
+				//enable "remove"
+				$("#removeButton").prop("disabled", false);
+				$("#sectionBorder").height("+=58");
+				$("#sectionBorder").css('top', (parseFloat($("#sectionBorder").css('top')) + 29) + 'px');
+				//console.log($("#comparisonRows").html());
+			}//end addcomparison
+
+			function removeComparison()
+			{
+				if(uniq_pid2==2) {$("#removeButton").prop("disabled", true); return;}
+				divname1="#player"+(uniq_pid2-1);
+				divname2="#player"+uniq_pid2;
+				divname3="#vs"+(uniq_pid2-(uniq_pid2/2));
+				divname4="#"+(br_id2-1);
+				divname5="#"+br_id2;
+
+				//decrement ID trackers
+				br_id2-=2;
+				uniq_pid2-=2;
+
+				//console.log("Test: "+divname1+" "+divname2+" "+divname3);
+
+				//remove row of elements
+				$(divname1).remove();
+				$(divname2).remove();
+				$(divname3).remove();
+				$(divname4).remove();
+				$(divname5).remove();
+
+
+				//enable "add" and fix size of background box
+				$("#addButton").prop("disabled", false);
+				$("#sectionBorder").height("-=58");
+				$("#sectionBorder").css('top', (parseFloat($("#sectionBorder").css('top')) - 29) + 'px');
+				if(uniq_pid2==2) {$("#removeButton").prop("disabled", true); return;}
+			}
+			function clearFields()
+			{
+				//clear value and border for all inputs
+				$("input").val('')
+				$("input").css("border", 'none');
+			}
+		</script>
+
+    </head>
+
+    <body>
+      <div id = "title" class = "LeagueTitle">
+        <p id="titletext"> LOLLYGAG </p>
+      </div>
+
+      <div id = "section">
+        <center>
+          <div class = "sectionItem">
+            <p class = "sectionHeader"> Compare players </p>
+			<!--div for data list -->
+			<p id = "listp" ></p>
+			<!-- div where content is dynamically added -->
+            <div class="input-list style-1 clearfix" id="comparisonRows">
+              	<!--<input id = "player1" name = "player1" type="text" list="Names" placeholder="Player 1" onfocus = "this.placeholder = ''" onblur = "this.placeholder = 'Player 1'" >
+              	<a class = "league_text"> vs </a>
+              	<input id = "player2" name = "player2" type="text" list="Names" placeholder="Player 2" onfocus = "this.placeholder = ''" onblur = "this.placeholder = 'Player 2'" >
+		      	<br> <br>-->
+            </div><!-- -->
+		    <button id="addButton" class = "button1" onClick=addComparison()>Add</button>
+		    <button id="removeButton" class = "button1" onClick=removeComparison() disabled=true>Remove</button>
+		    <button class = "button1" onClick=submitRequest()> Submit </button>
+		    <button id="clearButton" class = "button1" onClick=clearFields()>Clear</button>
+          </div>
+          <div id = "sectionBorder">
+          </div>
+        </center>
+      </div>
+</body>
+</html>

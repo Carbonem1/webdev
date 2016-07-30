@@ -5,6 +5,10 @@
 	if(isset($_POST['player4'])) {$player4=$_POST['player4'];}
 	if(isset($_POST['player5'])) {$player5=$_POST['player5'];}
 	if(isset($_POST['player6'])) {$player6=$_POST['player6'];}
+	if(isset($_POST['player7'])) {$player3=$_POST['player7'];}
+	if(isset($_POST['player8'])) {$player4=$_POST['player8'];}
+	if(isset($_POST['player9'])) {$player5=$_POST['player9'];}
+	if(isset($_POST['player10'])) {$player6=$_POST['player10'];}
 
 	try {
 		$conn = new PDO('mysql:host=127.0.0.1;dbname=predictor', 'root', 'DurgaLeon2016');
@@ -38,8 +42,28 @@
 			$querystring.=' OR ';
 			$querystring.='Name LIKE \''.$player6.'\' ';
 		}
-
+		if(isset($player7)) 
+		{
+			$querystring.=' OR ';
+			$querystring.='Name LIKE \''.$player7.'\' ';
+		}
+		if(isset($player8)) 
+		{
+			$querystring.=' OR ';
+			$querystring.='Name LIKE \''.$player8.'\' ';
+		}
+		if(isset($player9)) 
+		{
+			$querystring.=' OR ';
+			$querystring.='Name LIKE \''.$player9.'\' ';
+		}
+		if(isset($player10)) 
+		{
+			$querystring.=' OR ';
+			$querystring.='Name LIKE \''.$player10.'\' ';
+		}	
 		$querystring.=';';
+
 
 		//$querystring = 'SELECT AverageScore FROM Players WHERE Name LIKE \'Adrian\' OR Name LIKE \'Altec\';';
 		foreach($conn->query($querystring) as $row) {
