@@ -33,17 +33,18 @@
   z-index: 0;
 }
 
-.button1
+.buttonAdd
 {
     position: relative;
     margin: 10px 10px 10px 10px;
-	width: 5%;
+	width: 8%;
 	height: 30px;
     border-radius: 5px;
     font-family: LeagueText, 'Helvetica', cursive;
     font-size: 15px;
     color: #000000;
     text-decoration: none;
+	font-weight: bold;
     background-color: #F7BE00;
     border-bottom: 5px solid #E0A500;
     /* Animation */
@@ -51,14 +52,85 @@
     -webkit-transition: all 0.1s;
 }
 
-.button1:hover,
-.button1:focus {
+.buttonRemove
+{
+    position: relative;
+    margin: 10px 10px 10px 10px;
+	width: 8%;
+	height: 30px;
+    border-radius: 5px;
+    font-family: LeagueText, 'Helvetica', cursive;
+    font-size: 15px;
+    color: #000000;
+    text-decoration: none;
+	font-weight: bold;
+    background-color: #F7BE00;
+    border-bottom: 5px solid #E0A500;
+    /* Animation */
+    transition: all 0.1s;
+    -webkit-transition: all 0.1s;
+}
+
+.buttonSubmit
+{
+    position: relative;
+    margin: 10px 10px 10px 10px;
+	width: 8%;
+	height: 30px;
+    border-radius: 5px;
+    font-family: LeagueText, 'Helvetica', cursive;
+    font-size: 15px;
+    color: #000000;
+    text-decoration: none;
+	font-weight: bold;
+    background-color: #F7BE00;
+    border-bottom: 5px solid #E0A500;
+    /* Animation */
+    transition: all 0.1s;
+    -webkit-transition: all 0.1s;
+}
+
+.buttonClear
+{
+    position: relative;
+    margin: 10px 10px 10px 10px;
+	width: 8%;
+	height: 30px;
+    border-radius: 5px;
+    font-family: LeagueText, 'Helvetica', cursive;
+    font-size: 15px;
+    color: #000000;
+    text-decoration: none;
+	font-weight: bold;
+    background-color: #F7BE00;
+    border-bottom: 5px solid #E0A500;
+    /* Animation */
+    transition: all 0.1s;
+    -webkit-transition: all 0.1s;
+}
+
+.buttonAdd:hover,
+.buttonAdd:focus {
     text-decoration: none;
     color: #fff;
 }
 
-.button1:active {
-    border-bottom: 1px solid;
+.buttonRemove:hover,
+.buttonRemove:focus {
+    text-decoration: none;
+    color: #fff;
+}
+
+.buttonSubmit:hover,
+.buttonSubmit:focus {
+    text-decoration: none;
+    color: #fff;
+}
+
+.buttonClear:hover,
+.buttonClear:focus {
+    text-decoration: none;
+    color: #fff;
 }
 
 .league_text

@@ -56,6 +56,7 @@
 					}
 					dataString+="\}";
 
+//							console.log("We gave "+dataString);
 					//submit data to php file for MySQL query
 				    $.ajax({
 						type: "POST",
@@ -63,7 +64,9 @@
 						data: JSON.parse(dataString),
 						success: function(data) {
 							//get rid of the '{' and '}' around the JSON result
-							fullstring = data.slice(1, -1);
+							console.log("We were given:"+data+":");
+							fullstring = data.slice(3, -1);
+							console.log("We cut to:"+fullstring+":");
 							//split by each entry
 							fullstring = fullstring.split(",");
 
@@ -78,31 +81,36 @@
 								//slice quotes off name and score
 								name=name.slice(1,-1);
 								score=score.slice(1,-1);
+								console.log("Adding::"+name+"::");
+
+								//in case any bad characters are left from the JSON array
+								name.replace(/[\{\}\"]/g, '');
 								results[name] = score;
 							}
 							//iterate through text boxes and assign values
 							num_scores=0;//number of scores evaluated
 							for(i=0;i<5;i++)
 							{
-								console.log("Stage 1: "+num_scores);
-								playernum=num_scores+1;
-								str1="#player"+playernum.toString()
-								console.log("Stage 2: "+playernum);
 								
-								name1 = $(str1).val();
+								name1 = $("#player"+(num_scores+1)).val();
 								name2 = $("#player"+(num_scores+2)).val();
 
-								if(!name1 || !name2) {console.log("Hit end of input: "+ str1+ $("#player1").val());break;}
+
+								if(!name1 || !name2) {console.log("Hit end of input.");break;}
+
+								console.log("Evaluating:"+name1+":"+results[name1]);
+				
 								score1=results[name1];
 								score2=results[name2];
 
-								console.log("DIDNT Hit end of input");
 								//default comparison colors are quite dark
 								green = "#00FF00";
 								red   = "#FF0000";
 							
 								score1=parseFloat(score1);	
 								score2=parseFloat(score2);	
+
+								console.log("\tScores: "+score1+" "+score2);
 								if(score1 > score2)
 								{
 									//colors get lighter as win% is greater. at 30pts+, "green" actually becomes "gold"
@@ -125,6 +133,7 @@
 								}
 								else if(score1 == score2)
 								{
+									//scores are yellow if they're exactly even
 									$("#player"+(num_scores+2)).css("border", 'solid 5px #FFFF00');
 									$("#player"+(num_scores+1)).css("border", 'solid 5px #FFFF00');
 									$("#player"+(num_scores+1)).val(name1+": "+score1);
@@ -235,10 +244,10 @@
               	<input id = "player2" name = "player2" type="text" list="Names" placeholder="Player 2" onfocus = "this.placeholder = ''" onblur = "this.placeholder = 'Player 2'" >
 		      	<br> <br>
             </div><!-- -->
-		    <button id="addButton" class = "button1" onClick=addComparison()>Add</button>
-		    <button id="removeButton" class = "button1" onClick=removeComparison() disabled=true>Remove</button>
-		    <button class = "button1" onClick=submitRequest()> Submit </button>
-		    <button id="clearButton" class = "button1" onClick=clearFields()>Clear</button>
+		    <button id="addButton" class = "buttonAdd" onClick=addComparison()>Add</button>
+		    <button id="removeButton" class = "buttonRemove" onClick=removeComparison() disabled=true>Remove</button>
+		    <button class = "buttonSubmit" onClick=submitRequest()> Submit </button>
+		    <button id="clearButton" class = "buttonClear" onClick=clearFields()>Clear</button>
           </div>
           <div id = "sectionBorder">
           </div>
